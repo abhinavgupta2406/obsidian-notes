@@ -185,3 +185,124 @@ kubectl get rs
 ```
 
 ---
+## Deployments
+
+Definition will be exactly same as Replicaset except `kind` is `Deployment`
+
+Deployment creates replicaset for replicas
+![[Pasted image 20230824221438.png]]
+
+``` yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp-replicaset
+  labels:
+    app: myapp
+    type: front-end
+spec:
+  template:
+    metadata:
+      name: myapp-pod
+      labels:
+        app: myapp
+        type: front-end
+    spec:
+      containers:
+      - name: nginx-controller
+        image: nginx
+  replicas: 3
+  selector:
+    matchLabels:
+      type: front-end
+```
+
+```
+# Shortcut for deployments
+kubectl get deploy
+
+# Get help for creating deployment
+kubectl create deployment --help
+
+# Create deployment with command
+kubectl create deployment httpd-frontend --image=httpd:2.4-alpine --replicas=3
+```
+
+---
+## Namespaces
+
+Namespaces created by K8s automatically:
+* default
+* kube-system
+* kube-public
+
+### DNS
+If calling the service within same namespace, we can just use the service name.
+If calling the service in another namespace, a DNS is required.
+![[Pasted image 20230824224041.png]]
+
+![[Pasted image 20230824224125.png]]
+
+```
+# To create a definition file in a namespace
+kubectl create -f pod-definition.yml --namespace=dev
+```
+
+If you want to create a resource without specifying the namespace:
+```yaml
+apiVersion: v1
+kind: Pod
+
+metadata:
+  name: myapp-pod
+  namespace: dev
+  labels:
+    app: myapp
+    type: front-end
+spec:
+  containers:
+  - name: nginx-controller
+    image: nginx
+```
+
+```
+# Command to create new namespace
+kubectl create ns dev
+```
+
+```yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dev
+```
+
+```
+# To always choose a namespace when looking for resources (for example, here we are switching to dev namespace)
+kubectl config set-context $(kubectl config current-context) --namespace=dev
+
+# After above command, you need to specify namespace for default
+kubectl get pods --namespace=default
+
+# Get resources across all namespaces
+kubectl get pods --all-namespaces
+```
+
+### Resource Quota for Namespace
+
+``` yaml
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: compute-quota
+  namespace: dev
+spec:
+  hard:
+    pods: "10"
+    requests.cpu: "4"
+    requests.memory: 5Gi
+    limits.cpu: "10"
+    limits.memory: 10Gi
+```
+
+---
