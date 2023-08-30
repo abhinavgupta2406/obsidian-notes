@@ -19,5 +19,25 @@ kubectl get all -A
 ```
 # Imperative commands to generate YAML manifest files
 kubectl run nginx --image=nginx --dry-run=client -o yaml > nginx-pod.yaml
+
+# Imperative command to create pod and create service of ClusterIP by same name and exposing target port of 80 by pod
+kubectl run httpd --image=httpd:alpine --port=80 --expose
+
+# Imperative command to expose a pod through service
+kubectl expose pod redis --port 6379 --name redis-service
+```
+
+```
+# Imperative command to override arguments and commands
+
+# Please note that `--` is seperator between kubectl command and argument to the pods
+
+kubectl run webapp-green --image=kodekloud/webapp-color -- --color green
+
+# Start the nginx pod using the default command, but use custom arguments (arg1 .. argN) for that command
+kubectl run nginx --image=nginx -- <arg1> <arg2> ... <argN>
+
+# Start the nginx pod using a different command and custom arguments
+kubectl run nginx --image=nginx --command -- <cmd> <arg1> ... <argN>
 ```
 
