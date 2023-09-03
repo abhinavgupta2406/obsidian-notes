@@ -41,3 +41,7 @@ kubectl run nginx --image=nginx -- <arg1> <arg2> ... <argN>
 kubectl run nginx --image=nginx --command -- <cmd> <arg1> ... <argN>
 ```
 
+```
+# To replace pod after editing the definition file
+kubectl replace --force -f pod-definition.yaml
+```
