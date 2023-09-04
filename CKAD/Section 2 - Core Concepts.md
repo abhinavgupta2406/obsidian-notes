@@ -306,3 +306,172 @@ spec:
 ```
 
 ---
+# Taints and Tolerations
+
+Nothing to do with security
+
+By default pod don't have any tolerations. So if we apply a taint (or spray) to a node, pods with default values cannot be created in those nodes.
+
+TAINTS are set on NODES
+TOLERATIONS are set on PODS
+
+## Taints - Nodes
+
+```
+# Syntax
+kubectl taint nodes node-name key=value:taint-effect
+
+# taint-effect values can be NoSchedule, PreferNoSchedule and NoExecute
+```
+
+Pods that DO NOT TOLERATE this taint will have 3 effects: NoSchedule, PreferNoSchedule and NoExecute
+
+NoSchedule: Pods will not be scheduled on the node
+PreferNoSchedule: System will try to avoid placing the pod on the node, but that is not guaranteed.
+NoExecute: New pods will be not be scheduled and existing pods will be evicted if they do not tolerate the taint. Existing pods may have scheduled on the node when the taint was applied
+
+```
+# Example
+kubectl taint nodes node1 app=blue:NoSchedule
+```
+
+## Tolerations - Pods
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: myapp-pod
+spec:
+  containers:
+  - name: nginx-container
+    image: nginx
+  tolerations:
+  # Values should be in double quotes
+  # These values match from `taint nodes` command.
+  - key: "app"
+    operator: "Equal"
+    value: "blue"
+    effect: "NoSchedule"
+```
+
+So a pod with toleration can go to default nodes as well (where no taint is set). If we want to move certain pods to particular nodes, it will be done using __Node Affinity__
+
+> Scheduler never schedules pod on master node because Kubernetes cluster taints its master node. To check taint on master node: `kubectl describe node kubemaster | grep Taint`
+
+To remove taint from node: `kubectl edit node node01`
+Or another way is to remove by adding - at command like below:
+```
+# There's a hyphen sign at the end
+kubectl taint node controlplane <taint-value-copied-from-describe>-
+```
+
+---
+# Node Selectors
+
+If we want a pod that should be assigned to a particular node (for example data processing pod requires high resource, so it should go to a node with higher resources)
+``` yaml
+apiVersion: v1
+kind: Pod
+metadata
+  name: myapp-pod
+spec:
+  containers:
+  - name: data-processor
+    image: data-processor
+  nodeSelector:
+    # This label will be added to node
+    size: Large
+```
+
+## Label Nodes
+
+`kubectl label nodes <node-name> <label-key>=<label-value>`
+
+For above example: `kubectl label nodes node-1 size=Large`
+
+## Limitation of Node Selectors
+* What if we want to add pod based on multiple labels? Like Large or Medium
+* Or exclude a node. For example, add the pod where NOT Small.
+
+So Node Affinity and Anti Affinity is used
+
+---
+# Node Affinity
+
+This is to ensure that pods are hosted on particular nodes.
+
+``` yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: myapp-pod
+spec:
+  containers:
+  - name: data-processor
+    image: data-processor
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: size
+            operator: In
+            values:
+            # These values are matching the labels on nodes
+            - Large
+            - Medium
+```
+
+
+``` yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: myapp-pod
+spec:
+  containers:
+  - name: data-processor
+    image: data-processor
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: size
+            operator: NotIn
+            values:
+            # These values are matching the labels on nodes
+            - Small
+```
+
+``` yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: myapp-pod
+spec:
+  containers:
+  - name: data-processor
+    image: data-processor
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: size
+            # This is checking whether size label is there in any node.
+            operator: Exists
+```
+
+**requiredDuringSchedulingIgnoredDuringExecution**
+* As name suggests a `nodeSelectorTerms` should work when creating/scheduling.
+* But doesn't evict the existing running pod in the node if changes are there in node labels - example if `size` label is removed.
+
+**preferredDuringSchedulingIgnoredDuringExecution**
+* As name suggests a `nodeSelectorTerms` may/may not work when creating/scheduling.
+* But doesn't evict the existing running pod in the node if changes are there in node labels - example if `size` label is removed.
+
+**requiredDuringSchedulingRequiredDuringExecution**
+* As name suggests a `nodeSelectorTerms` may/may not work when creating/scheduling.
+* It will evict the existing running pod in the node if changes are there in node labels - example if `size` label is removed.
+

@@ -521,3 +521,100 @@ spec:
 If CPU limit is reached, it will not let the pod consume more CPU.
 
 But with memory limit is reached, pod is allowed to have more memory, but it will be terminated with OOM (out of memory) error.
+
+## Default Behaviour
+
+By default there is no request or limit defined in a pod.
+
+## Behaviour - CPU
+
+* NO REQUEST + NO LIMITS
+	* In this case, 1st pod can use all the CPU resources and prevent the 2nd pod to get required resources.
+	* Not Ideal
+* NO REQUEST + LIMITS
+	* In this scenario, Kubenetes sets REQUESTS = LIMITs
+* REQUESTS + LIMITS
+	* If pod 1 wants more CPU and pod 2 isn't consuming much CPU resource, this is not the ideal case.
+	* So we should allow pod 1 to have CPU when pod 2 doesn't need the CPU.
+* REQUESTS + NO LIMITS
+	* Ideal
+	* It will help avoid scenario in last point.
+
+## Behaviour - Memory
+
+* NO REQUEST + NO LIMITS
+	* Not ideal
+* NO REQUEST + LIMITS
+	* In this scenario, Kubenetes sets REQUESTS = LIMITs
+* REQUESTS + LIMITS
+* REQUESTS + NO LIMITS
+	* If pod 2 wants more memory, pod 1 has to be deleted.
+	* Once the memory is assigned, only way to retrieve is to kill the pod.
+	* Because unlike CPU we cannot throttle memory.
+
+## Setting Default - LimitRange
+
+If you change existing pod, it will not affect. It will only affect new pods.
+
+``` yaml
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: cpu-resource-constraint
+spec:
+  limits:
+  - default:
+      # Limit
+      cpu: 500m
+	defaultRequest:
+	  # Request
+	  cpu: 500m
+	max:
+	  # Limit
+	  cpu: "1"
+	min:
+	  # Request
+	  cpu: 100m
+    type: Container
+```
+
+``` yaml
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: memory-resource-constraint
+spec:
+  limits:
+  - default:
+      # Limit
+      memory: 1Gi
+	defaultRequest:
+	  # Request
+	  memory: 1Gi
+	max:
+	  # Limit
+	  memory: 1Gi
+	min:
+	  # Request
+	  memory: 500Mi
+    type: Container
+```
+
+Above values are examples, not recommended.
+
+## Resource Quotas
+
+Set hard limits at namespace level - say all pods should not consume more then x
+
+```
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: my-resource-quota
+spec:
+  hard:
+    requests.cpu: "4"
+    requests.memory: 5Gi
+    limits.cpu: "10"
+    limits.memory: 10Gi
+```
