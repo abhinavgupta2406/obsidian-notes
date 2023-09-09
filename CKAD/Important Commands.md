@@ -1,4 +1,12 @@
 ```
+# To list all aliases
+alias
+
+# You know what you are doing
+alias k=kubectl
+```
+
+```
 # To get explaination of resource type and their API version
 kubectl explain replicaset
 ```
@@ -44,4 +52,28 @@ kubectl run nginx --image=nginx --command -- <cmd> <arg1> ... <argN>
 ```
 # To replace pod after editing the definition file
 kubectl replace --force -f pod-definition.yaml
+```
+
+```
+# To create ingress
+kubectl create ingress <ingress-name> --rule="host/path=service:port"
+
+kubectl create ingress ingress-test --rule="wear.my-online-store.com/wear*=wear-service:80"
+```
+
+```
+# Get current context (this doesn't give much info)
+kubectl config current-context
+
+# Change namespace to get its resources without mentioning -n
+kubectl config set-context $(kubectl config current-context) --namespace=dev
+
+# View name of the namespace in current context
+# It will be there in contexts[0].context.namespace
+kubectl config view
+```
+
+```
+# Get pods based on labels
+kubectl get pods --selector=name=payroll
 ```
