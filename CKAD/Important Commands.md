@@ -7,6 +7,11 @@ alias k=kubectl
 ```
 
 ```
+# In exam, it can be asked to set contexts or change namespace
+kubectl config set-context mycontext --namespace=mynamespace
+```
+
+```
 # To get explaination of resource type and their API version
 kubectl explain replicaset
 ```
@@ -76,4 +81,22 @@ kubectl config view
 ```
 # Get pods based on labels
 kubectl get pods --selector=name=payroll
+```
+
+```
+# To count number of resources (including headers)
+kubectl get clusterroles -A | wc -l
+
+# This will give line count including headers, so find value will be outputValue - 1.
+
+# To count without headers
+kubectl get clusterroles -A --no-headers | wc -l
+```
+
+```
+# Get namespaced resources
+kubectl api-resources --namespaced=true
+
+# Get cluster wide resources
+kubectl api-resources --namespaced=false
 ```
