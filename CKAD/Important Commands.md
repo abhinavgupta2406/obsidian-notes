@@ -100,3 +100,5 @@ kubectl api-resources --namespaced=true
 # Get cluster wide resources
 kubectl api-resources --namespaced=false
 ```
+
+* https://kubernetes.io/docs/tasks/access-application-cluster/communicate-containers-same-pod-shared-volume/
