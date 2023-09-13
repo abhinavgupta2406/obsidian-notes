@@ -102,3 +102,16 @@ kubectl api-resources --namespaced=false
 ```
 
 * https://kubernetes.io/docs/tasks/access-application-cluster/communicate-containers-same-pod-shared-volume/
+
+```
+kubectl get events #https://github.com/dgkanatsios/CKAD-exercises/blob/main/e.observability.md#create-an-nginx-pod-that-includes-port-80-with-an-http-readinessprobe-on-path--on-port-80-again-run-it-check-the-readinessprobe-delete-it
+```
+
+```
+# Get list of endpoints
+kubectl get ep
+
+# This will return how many endpoints are listening to the service
+kubectl get ep <SERVICE_NAME>
+```
+
