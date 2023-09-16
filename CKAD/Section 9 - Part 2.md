@@ -207,4 +207,19 @@ helm pull --untar bitnami/wordpress
 helm install release-4 ./wordpress
 ```
 
+More read: https://github.com/dgkanatsios/CKAD-exercises/blob/main/h.helm.md
+```
+helm show values bitnami/node
 
+helm show values bitnami/node | grep -i replica
+helm install mynode bitnami/node --set replicaCount=5
+```
+
+```
+helm ls -n mercury
+
+k get ep # Most important to see connections from services to pods
+
+# Create temporary pod to run a command and immediately delete
+k run temp --image=nginx --rm --restart=Never -i -- curl ...
+```

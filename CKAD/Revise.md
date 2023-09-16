@@ -19,4 +19,7 @@
 * https://github.com/dgkanatsios/CKAD-exercises/blob/main/f.services.md#create-an-nginx-deployment-of-2-replicas-expose-it-via-a-clusterip-service-on-port-80-create-a-networkpolicy-so-that-only-pods-with-labels-access-granted-can-access-the-deployment-and-apply-it
 * * https://github.com/dgkanatsios/CKAD-exercises/blob/main/g.state.md#create-a-second-pod-which-is-identical-with-the-one-you-just-created-you-can-easily-do-it-by-changing-the-name-property-on-podyaml-connect-to-it-and-verify-that-etcfoo-contains-the-passwd-file-delete-pods-to-cleanup-note-if-you-cant-see-the-file-from-the-second-pod-can-you-figure-out-why-what-would-you-do-to-fix-that
 * https://github.com/dgkanatsios/CKAD-exercises/blob/main/g.state.md#create-a-busybox-pod-with-sleep-3600-as-arguments-copy-etcpasswd-from-the-pod-to-your-local-folder
+* https://github.com/dgkanatsios/CKAD-exercises/blob/main/j.podman.md#build-and-see-how-many-layers-the-image-consists-of
+* https://github.com/dgkanatsios/CKAD-exercises/blob/main/j.podman.md#build-and-see-how-many-layers-the-image-consists-of
+* https://github.com/dgkanatsios/CKAD-exercises/blob/main/j.podman.md#build-and-see-how-many-layers-the-image-consists-of
 * 

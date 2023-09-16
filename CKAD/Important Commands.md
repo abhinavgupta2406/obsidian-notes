@@ -113,5 +113,11 @@ kubectl get ep
 
 # This will return how many endpoints are listening to the service
 kubectl get ep <SERVICE_NAME>
+
+# Get next 10 lines
+grep <content> -A10
+
+# Get previous 10 lines
+grep <content> -B10
 ```
 
